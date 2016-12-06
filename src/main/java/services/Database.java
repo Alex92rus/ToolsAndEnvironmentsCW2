@@ -1,6 +1,5 @@
 package services;
 
-import models.Build;
 import models.BuildSummary;
 
 import java.sql.*;
@@ -14,7 +13,7 @@ public class Database
     private final String db_url = "jdbc:mysql://localhost/torrent?useSSL=false";
     private final String db_user = "root";
     private final String db_password = "root";
-    private final String db_table = "travistorrent_27_10_2016";
+    private final String db_table = "travistorrent_6_12_2016";
 
     private Connection connection;
 
@@ -41,11 +40,14 @@ public class Database
 
     public ArrayList<BuildSummary> getBuildSummaries() throws SQLException
     {
-        String query = "select gh_project_name, gh_lang, gh_by_core_team_member, tr_status, count( tr_status ) as counter " +
+        String query = "select gh_project_name, gh_by_core_team_member, tr_status, count( tr_status ) as counter " +
                         "from " + this.db_table + " " +
                         "where tr_status <> 'canceled' " +
-                        "group by gh_project_name, gh_by_core_team_member, tr_status, gh_lang " +
+                        "group by gh_project_name, gh_by_core_team_member, tr_status " +
                         "order by gh_project_name";
+
+        System.out.println( query );
+        System.exit(1);
 
         ArrayList<BuildSummary> summaries = new ArrayList<>();
 
@@ -56,7 +58,6 @@ public class Database
             {
                 summaries.add( new BuildSummary(
                         resultSet.getString( "gh_project_name" ),
-                        resultSet.getString( "gh_lang" ),
                         resultSet.getBoolean( "gh_by_core_team_member" ),
                         resultSet.getString( "tr_status" ),
                         resultSet.getInt( "counter" )
@@ -66,30 +67,6 @@ public class Database
         }
 
         return summaries;
-    }
-
-
-    public ArrayList<Build> getNumberOfJobsPerBuild() throws SQLException
-    {
-        String query = "select distinct gh_project_name, tr_build_id, tr_jobs " +
-                       "from " + this.db_table + " " +
-                       "where tr_jobs <> '[]'";
-
-        ArrayList<Build> builds = new ArrayList<>();
-
-        try ( PreparedStatement statement = this.connection.prepareStatement( query );
-              ResultSet resultSet = statement.executeQuery(); )
-        {
-            while( resultSet.next() )
-            {
-                builds.add( new Build(
-                        resultSet.getString( "tr_jobs" )
-                        )
-                );
-            }
-        }
-
-        return builds;
     }
 
 

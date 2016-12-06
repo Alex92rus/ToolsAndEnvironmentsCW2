@@ -1,6 +1,5 @@
 import services.ConsolePrinter;
 import services.Database;
-import services.JobAnalyser;
 import services.ProjectAnalyser;
 
 /**
@@ -19,10 +18,6 @@ public class Main
             // Creates project build summaries
             ProjectAnalyser projectBuildAggregator = new ProjectAnalyser();
             projectBuildAggregator.run( db );
-
-            // Creates job distribution summary based on all builds
-            JobAnalyser jobAnalyser = new JobAnalyser();
-            jobAnalyser.run( db );
         }
         catch ( Exception e )
         {

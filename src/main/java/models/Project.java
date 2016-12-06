@@ -13,7 +13,7 @@ public class Project
     private ContributionTeam outside;
 
 
-    public Project( String name, String language )
+    public Project( String name )
     {
         this.name = name;
         this.language = language;

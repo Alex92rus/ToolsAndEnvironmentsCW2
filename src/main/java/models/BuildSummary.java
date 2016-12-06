@@ -6,16 +6,14 @@ package models;
 public class BuildSummary
 {
     private String projectName;
-    private String language;
     private boolean isFromCore;
     private String status;
     private int counter;
 
 
-    public BuildSummary(String projectName, String language, boolean isFromCore, String status, int counter )
+    public BuildSummary(String projectName, boolean isFromCore, String status, int counter )
     {
         this.projectName = projectName;
-        this.language = language;
         this.isFromCore = isFromCore;
         this.status = status;
         this.counter = counter;
@@ -25,12 +23,6 @@ public class BuildSummary
     public String getProjectName()
     {
         return this.projectName;
-    }
-
-
-    public String getLanguage()
-    {
-        return this.language;
     }
 
 

@@ -66,14 +66,14 @@ public class ProjectAnalyser implements Processor
             // Reached last summary - add last summary and then process project metrics right away
             if ( counter == summaries.size() - 1 )
             {
-                this.createProject( name, summary.getLanguage(), projectSummaries );
+                this.createProject( name, projectSummaries );
                 break;
             }
 
             // Reached new project - process project metrics, update new project name and clear old project summaries
             if ( !summary.getProjectName().equals( name ) )
             {
-                this.createProject( name, summary.getLanguage(), projectSummaries );
+                this.createProject( name, projectSummaries );
                 name = summary.getProjectName();
                 projectSummaries.clear();
             }
@@ -126,10 +126,10 @@ public class ProjectAnalyser implements Processor
     }
 
 
-    private void createProject( String name, String language, ArrayList<BuildSummary> summaries )
+    private void createProject( String name, ArrayList<BuildSummary> summaries )
     {
         // Create new project and add it to the list
-        Project newProject = new Project( name, language );
+        Project newProject = new Project( name );
         this.projects.add( newProject );
 
         // Add summaries to project and process them
