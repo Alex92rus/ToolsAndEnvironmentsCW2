@@ -1,24 +1,59 @@
 package services;
 
+import interfaces.Processor;
 import models.BuildSummary;
 import models.ContributionTeam;
 import models.Project;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
  * Created by andreas on 04/12/2016.
  */
-public class ProjectProcessor
+public class ProjectAnalyser implements Processor
 {
-    private ArrayList< Project > projects = new ArrayList<>();
+    private ArrayList< Project > projects;
+    private CSVFileWriter csvWriter;
 
 
-    public void createProjects(ArrayList< BuildSummary > summaries )
+    public ProjectAnalyser()
+    {
+        this.projects = new ArrayList<>();
+        this.csvWriter = new CSVFileWriter( "project-build-summary.csv" );
+    }
+
+
+    @Override
+    public void run( Database database  ) throws SQLException
+    {
+        // Get all build summaries
+        ConsolePrinter.print( "Retrieve build summaries (this takes up to several minutes)" );
+        ArrayList<BuildSummary> summaries = database.getBuildSummaries();
+        ConsolePrinter.print( "Found summaries " + summaries.size() + " to process" );
+
+        // Aggregate build summaries for each project
+        ConsolePrinter.print( "Start aggregating build summaries for each project" );
+        this.createProjects( summaries );
+        ConsolePrinter.print( "Created " + this.getTotal() + " projects" );
+
+        // Filter relevant projects
+        ConsolePrinter.print( "Start filtering projects" );
+        int totalRemoved = this.filterProjects();
+        ConsolePrinter.print( "Removed " + totalRemoved + " projects" );
+
+        // Write remaining projects to a file
+        ConsolePrinter.print( "Write projects to file" );
+        this.outputResultsToFile();
+        ConsolePrinter.print( "Finished writing to file" );
+    }
+
+
+    private void createProjects(ArrayList<BuildSummary> summaries )
     {
         // Stores temporary build summaries that correspond to a particular project
-        ArrayList< BuildSummary > projectSummaries = new ArrayList<>();
+        ArrayList<BuildSummary> projectSummaries = new ArrayList<>();
 
         // Stores the nth summary - used for checking when last summary will be reached
         int counter = 0;
@@ -51,7 +86,7 @@ public class ProjectProcessor
     }
 
 
-    public int filterProjects()
+    private int filterProjects()
     {
         Iterator< Project > iterator = this.projects.iterator();
         int counter = 0;
@@ -73,23 +108,25 @@ public class ProjectProcessor
     }
 
 
-    public void outputResultsToFile()
+    private void outputResultsToFile()
     {
+        this.csvWriter.writeHeader( Project.getColumnNames() );
+
         for ( Project project : this.projects )
         {
             ConsolePrinter.print( project.toString(), 5 );
-            CSVFileWriter.write( project.toString() );
+            this.csvWriter.write( project.toString() );
         }
     }
 
 
-    public int getTotal()
+    private int getTotal()
     {
         return this.projects.size();
     }
 
 
-    private void createProject( String name, String language, ArrayList< BuildSummary > summaries )
+    private void createProject( String name, String language, ArrayList<BuildSummary> summaries )
     {
         // Create new project and add it to the list
         Project newProject = new Project( name, language );

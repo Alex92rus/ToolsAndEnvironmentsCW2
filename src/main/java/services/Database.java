@@ -1,7 +1,7 @@
 package services;
 
+import models.Build;
 import models.BuildSummary;
-import models.Project;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class Database
     }
 
 
-    public ArrayList<BuildSummary > getBuildSummaries() throws SQLException
+    public ArrayList<BuildSummary> getBuildSummaries() throws SQLException
     {
         String query = "select gh_project_name, gh_lang, gh_by_core_team_member, tr_status, count( tr_status ) as counter " +
                         "from " + this.db_table + " " +
@@ -47,7 +47,7 @@ public class Database
                         "group by gh_project_name, gh_by_core_team_member, tr_status, gh_lang " +
                         "order by gh_project_name";
 
-        ArrayList< BuildSummary > summaries = new ArrayList<>();
+        ArrayList<BuildSummary> summaries = new ArrayList<>();
 
         try ( PreparedStatement statement = this.connection.prepareStatement( query );
               ResultSet resultSet = statement.executeQuery(); )
@@ -66,6 +66,30 @@ public class Database
         }
 
         return summaries;
+    }
+
+
+    public ArrayList<Build> getNumberOfJobsPerBuild() throws SQLException
+    {
+        String query = "select distinct gh_project_name, tr_build_id, tr_jobs " +
+                       "from " + this.db_table + " " +
+                       "where tr_jobs <> '[]'";
+
+        ArrayList<Build> builds = new ArrayList<>();
+
+        try ( PreparedStatement statement = this.connection.prepareStatement( query );
+              ResultSet resultSet = statement.executeQuery(); )
+        {
+            while( resultSet.next() )
+            {
+                builds.add( new Build(
+                        resultSet.getString( "tr_jobs" )
+                        )
+                );
+            }
+        }
+
+        return builds;
     }
 
 

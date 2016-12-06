@@ -7,7 +7,7 @@ public class ConsolePrinter
 {
     public static void printError( Exception e )
     {
-        System.out.println( "ERROR OCCURRED: " +  e.getMessage() );
+        System.err.println( "ERROR OCCURRED: " +  e.getMessage() );
     }
 
 

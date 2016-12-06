@@ -12,7 +12,7 @@ public class BuildSummary
     private int counter;
 
 
-    public BuildSummary( String projectName, String language, boolean isFromCore, String status, int counter )
+    public BuildSummary(String projectName, String language, boolean isFromCore, String status, int counter )
     {
         this.projectName = projectName;
         this.language = language;

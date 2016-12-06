@@ -1,11 +1,7 @@
-import models.BuildSummary;
-import models.Project;
-import services.CSVFileWriter;
 import services.ConsolePrinter;
 import services.Database;
-import services.ProjectProcessor;
-
-import java.util.ArrayList;
+import services.JobAnalyser;
+import services.ProjectAnalyser;
 
 /**
  * Created by andreas on 01/12/2016.
@@ -18,35 +14,19 @@ public class Main
         ConsolePrinter.print( "\nProgram started" );
         Database db = new Database();
 
-        // Write header to CSV file
-        CSVFileWriter.writeHeader( Project.getColumnNames() );
-
         try
         {
-            // Get all build summaries
-            ConsolePrinter.print( "Retrieve build summaries (this takes up to several minutes)" );
-            ArrayList< BuildSummary > summaries = db.getBuildSummaries();
-            ConsolePrinter.print( "Found summaries " + summaries.size() + " to process" );
+            // Creates project build summaries
+            ProjectAnalyser projectBuildAggregator = new ProjectAnalyser();
+            projectBuildAggregator.run( db );
 
-            // Aggregate build summaries for each project
-            ConsolePrinter.print( "Start aggregating build summaries for each project" );
-            ProjectProcessor projectProcessor = new ProjectProcessor();
-            projectProcessor.createProjects( summaries );
-            ConsolePrinter.print( "Created " + projectProcessor.getTotal() + " projects" );
-
-            // Filter relevant projects
-            ConsolePrinter.print( "Start filtering projects" );
-            int totalRemoved = projectProcessor.filterProjects();
-            ConsolePrinter.print( "Removed " + totalRemoved + " projects" );
-
-            // Write remaining projects to a file
-            ConsolePrinter.print( "Write projects file" );
-            projectProcessor.outputResultsToFile();
-            ConsolePrinter.print( "Finished writing to file" );
-
+            // Creates job distribution summary based on all builds
+            JobAnalyser jobAnalyser = new JobAnalyser();
+            jobAnalyser.run( db );
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
+            e.printStackTrace();
             ConsolePrinter.printError( e );
         }
 

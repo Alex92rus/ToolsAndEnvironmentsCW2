@@ -9,18 +9,24 @@ import java.io.IOException;
  */
 public class CSVFileWriter
 {
-    private final static String fileName = "output.csv";
+    private String fileName;
 
 
-    public static void writeHeader( String header )
+    public CSVFileWriter( String fileName )
     {
-        CSVFileWriter.write( header );
+        this.fileName = fileName;
     }
 
 
-    public static void write( String content )
+    public void writeHeader( String header )
     {
-        try ( BufferedWriter bw = new BufferedWriter( new FileWriter( CSVFileWriter.fileName, true ) ) )
+        this.write( header );
+    }
+
+
+    public void write( String content )
+    {
+        try ( BufferedWriter bw = new BufferedWriter( new FileWriter( this.fileName, true ) ) )
         {
             bw.write( content + "\n" );
         }
