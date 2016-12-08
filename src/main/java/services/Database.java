@@ -46,9 +46,6 @@ public class Database
                         "group by gh_project_name, gh_by_core_team_member, tr_status " +
                         "order by gh_project_name";
 
-        System.out.println( query );
-        System.exit(1);
-
         ArrayList<BuildSummary> summaries = new ArrayList<>();
 
         try ( PreparedStatement statement = this.connection.prepareStatement( query );
